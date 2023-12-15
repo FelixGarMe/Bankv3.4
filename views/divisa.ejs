@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convertidor de Divisas</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+
+    <!-- FontAwesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container {
+            max-width: 600px;
+            margin-top: 50px;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        #resultado {
+            font-size: 1.2rem;
+        }
+
+        /* Agregar animaciones */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Aplicar animaciones */
+        form, #resultado {
+            animation: fadeIn 0.8s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container text-center">
+    <h2 class="mb-4">Convertidor de Divisas</h2>
+
+    <form id="conversorForm">
+        <div class="form-group">
+            <label for="cantidadUSD">Cantidad en USD:</label>
+            <input type="number" id="cantidadUSD" name="cantidadUSD" step="any" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label for="divisaDestino">Divisa de Destino:</label>
+            <select id="divisaDestino" name="divisaDestino" class="form-control" required>
+                <option value="EUR">EUR</option>
+                <option value="GBP">GBP</option>
+                <option value="JPY">JPY</option>
+                <option value="AUD">AUD</option>
+                <!-- Agrega más divisas según sea necesario -->
+            </select>
+        </div>
+    </form>
+
+    <p id="resultado" class="font-weight-bold text-success">Resultado: </p>
+</div>
+
+<script>
+    const cantidadUSDInput = document.getElementById('cantidadUSD');
+    const divisaDestinoSelect = document.getElementById('divisaDestino');
+    const resultadoElement = document.getElementById('resultado');
+
+    async function convertir() {
+        const cantidadUSD = cantidadUSDInput.value;
+        const divisaDestino = divisaDestinoSelect.value;
+
+        try {
+            const response = await fetch(`/api/divisas`);
+            const tasasDeCambio = await response.json();
+
+            const tasaDeCambio = tasasDeCambio[divisaDestino];
+            const resultado = cantidadUSD * tasaDeCambio;
+
+            resultadoElement.innerText = `Resultado: ${cantidadUSD} USD = ${resultado.toFixed(2)} ${divisaDestino}`;
+        } catch (error) {
+            console.error('Error al obtener tasas de cambio:', error);
+        }
+    }
+
+    // Escucha eventos de cambio en los campos de entrada y realiza la conversión en tiempo real
+    cantidadUSDInput.addEventListener('input', convertir);
+    divisaDestinoSelect.addEventListener('change', convertir);
+
+    // Realiza la conversión inicial al cargar la página
+    convertir();
+</script>
+
+</body>
+</html>
